@@ -8,6 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Task implements Serializable {
@@ -16,27 +21,34 @@ public class Task implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String name;
+	private String title;
 	private String subject;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm")
 	private Date creationDate;
-
+	
+	@ManyToOne
+	@JoinColumn(name = "chart_id")
+	@JsonIgnore
+	private Chart chart;
+	
 	public Task() {
 	}
-
-	public Task(Long id, String name, String subject, Date creationDate) {
+	
+	public Task(Long id, String title, String subject, Date creationDate, Chart chart) {
 		super();
 		this.id = id;
-		this.name = name;
+		this.title = title;
 		this.subject = subject;
 		this.creationDate = creationDate;
+		this.chart = chart;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getSubject() {
@@ -61,6 +73,14 @@ public class Task implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public Chart getChart() {
+		return chart;
+	}
+
+	public void setChart(Chart chart) {
+		this.chart = chart;
 	}
 
 	@Override

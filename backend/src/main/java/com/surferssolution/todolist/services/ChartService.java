@@ -1,6 +1,5 @@
 package com.surferssolution.todolist.services;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,61 +10,49 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.surferssolution.todolist.entities.Chart;
 import com.surferssolution.todolist.entities.Task;
-import com.surferssolution.todolist.repositories.TaskRepository;
+import com.surferssolution.todolist.repositories.ChartRepository;
 import com.surferssolution.todolist.services.exceptions.DatabaseException;
 import com.surferssolution.todolist.services.exceptions.ResourceNotFoundException;
 
 @Service
-public class TaskService {
+public class ChartService {
 
 	@Autowired
-	TaskRepository taskRepository;
+	private ChartRepository chartRepository;
 
-	@Autowired
-	ChartService chartService;
-	
-	public Task findById(Long id) {
-		Optional<Task> obj = taskRepository.findById(id);
+	public Chart findById(Long id) {
+		Optional<Chart> obj = chartRepository.findById(id);
 		return obj.orElseThrow(() -> new ResourceNotFoundException(id));
 	}
 
-	public List<Task> findAll() {
-		return taskRepository.findAll();
+	public List<Chart> findAll() {
+		return chartRepository.findAll();
 
 	}
 
-	public List<Task> findAllByChart(Long id) {
-		return taskRepository.findTaskByChart(id);
-	}
-
-	public Task insert(Task obj) {
+	public Chart insert(Chart obj) {
 		obj.setId(null);
-		obj.setTitle(obj.getTitle());
-		obj.setSubject(obj.getSubject());
-		obj.setCreationDate(new Date());
-		obj.setChart(obj.getChart());
-//		chartService.addTask(obj);
-		taskRepository.save(obj);
+		obj.setName(obj.getName());
+		chartRepository.save(obj);
 		return obj;
 	}
 
-	public Task update(Long id, Task obj) {
-		Task entity = taskRepository.getReferenceById(id);
+	public Chart update(Long id, Chart obj) {
+		Chart entity = chartRepository.getReferenceById(id);
 		updateData(entity, obj);
-		return taskRepository.save(entity);
+		return chartRepository.save(entity);
 
 	}
 
-	public void updateData(Task entity, Task obj) {
-		entity.setTitle(obj.getTitle());
-		entity.setSubject(obj.getSubject());
-		entity.setChart(obj.getChart());
+	public void updateData(Chart entity, Chart obj) {
+		entity.setName(obj.getName());
 	}
 
 	public void delete(Long id) {
 		try {
-			taskRepository.deleteById(id);
+			chartRepository.deleteById(id);
 		} catch (IllegalStateException e) {
 			throw new ResourceNotFoundException(id);
 		} catch (DataIntegrityViolationException e) {
@@ -73,9 +60,16 @@ public class TaskService {
 		}
 	}
 
-	public Page<Task> findPage(Integer page, Integer linesPerPage, String orderBy, String direction) {
+	public Chart addTask(Task task) {
+		Chart entity = task.getChart();
+		entity.getTasks().add(task);
+		
+		return entity;
+	}
+	
+	public Page<Chart> findPage(Integer page, Integer linesPerPage, String orderBy, String direction) {
 		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
-		return taskRepository.findAll(pageRequest);
+		return chartRepository.findAll(pageRequest);
 	}
 
 }
